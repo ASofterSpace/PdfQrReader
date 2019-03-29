@@ -8,10 +8,12 @@ import com.asofterspace.toolbox.barcodes.QrCode;
 import com.asofterspace.toolbox.io.BinaryFile;
 import com.asofterspace.toolbox.io.Directory;
 import com.asofterspace.toolbox.io.File;
+import com.asofterspace.toolbox.io.ImageFile;
 import com.asofterspace.toolbox.io.PdfFile;
 import com.asofterspace.toolbox.io.PdfObject;
 import com.asofterspace.toolbox.io.PpmFile;
 import com.asofterspace.toolbox.io.SimpleFile;
+import com.asofterspace.toolbox.utils.Image;
 import com.asofterspace.toolbox.Utils;
 
 import java.util.List;
@@ -35,42 +37,85 @@ public class Main {
 		Directory targetDir = new Directory("data");
 		targetDir.clear();
 
-		inputFile.exportPictures(targetDir);
+		List<File> imageFiles = inputFile.exportPictures(targetDir);
 
 		SimpleFile lineOutput = new SimpleFile("output.txt");
 		lineOutput.clearContent();
 
-		PpmFile ppm = new PpmFile("data/Image4.ppm");
+		for (File imageFile : imageFiles) {
 
-		// great!
-		// now try to read out a version 3 QR code...
-		// for now, let's just hardcode the QR code location:
-		// it starts at 1175, 4
-		// it is rotated left - but our fancy QrCode should automatically notice that! ^^
-		// it is a bit larger than one pixel per QR-pixel, but not quite two pixels per QR-pixel
-		int offsetX = 1175;
-		int offsetY = 4;
-		int enlargeX = 0;
-		int enlargeY = 0;
-		QrCode code = new QrCode(3);
-		for (int x = 0; x < code.getWidth(); x++) {
-			for (int y = 0; y < code.getHeight(); y++) {
-				code.setDatapoint(x, y, ppm.getPixel(offsetX + x + enlargeX, offsetY + y + enlargeY).isDark());
-				if (y % 4 != 3) {
-					enlargeY++;
+			Image img = ImageFile.readImageFromFile(imageFile);
+
+			// great!
+			// now try to read out a version 3 QR code...
+			// for now, let's just hardcode the QR code location:
+			// go to a column that is right-wards of the logo at the left...
+			// row four...
+			// advance to the right until you get a dark one!
+			int offsetX3 = 300;
+			for (; offsetX3 < img.getWidth(); offsetX3++) {
+				if (img.getPixel(offsetX3, 3).isDark()) {
+					break;
 				}
 			}
-			if (x % 4 != 3) {
-				enlargeX++;
+			int offsetX4 = 300;
+			for (; offsetX4 < img.getWidth(); offsetX4++) {
+				if (img.getPixel(offsetX4, 4).isDark()) {
+					break;
+				}
 			}
-			enlargeY = 0;
+			int offsetX5 = 300;
+			for (; offsetX5 < img.getWidth(); offsetX5++) {
+				if (img.getPixel(offsetX5, 5).isDark()) {
+					break;
+				}
+			}
+
+			int offsetY = 3;
+			int offsetX = offsetX3;
+
+			if (offsetX4 < offsetX) {
+				offsetY = 4;
+				offsetX = offsetX4;
+			}
+
+			if (offsetX5 < offsetX) {
+				offsetY = 5;
+				offsetX = offsetX5;
+			}
+
+			System.out.println("Reading QR Code from " + imageFile.getLocalFilename() + " at [" + img.getWidth() + " x " + offsetX + "]");
+
+			int enlargeX = 0;
+			int enlargeY = 0;
+			QrCode code = new QrCode(3);
+			for (int x = 0; x < code.getWidth(); x++) {
+				for (int y = 0; y < code.getHeight(); y++) {
+					code.setDatapoint(x, y, img.getPixel(offsetX + x + enlargeX, offsetY + y + enlargeY).isDark());
+					if (y % 4 != 3) {
+						enlargeY++;
+					}
+				}
+				if (x % 4 != 3) {
+					enlargeX++;
+				}
+				enlargeY = 0;
+			}
+
+			String thisContent = code.getContent();
+
+			System.out.println("QR code is: " + thisContent + "\n");
+
+			lineOutput.appendContent(thisContent);
+
+			/*
+			PpmFile debugFile = new PpmFile("data/qr" + imageFile.getLocalFilename() + ".ppm");
+			debugFile.assign(	code.getDatapointsAsImage());
+			debugFile.save();
+			*/
 		}
 
-		String thisContent = code.getContent();
-
-		lineOutput.appendContent(thisContent);
-
-		lineOutput.save();
+		lineOutput.saveWithSystemLineEndings();
 	}
 
 }

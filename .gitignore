@@ -38,4 +38,5 @@ config
 *.txt
 *.csv
 *.json
+*.xml
 data

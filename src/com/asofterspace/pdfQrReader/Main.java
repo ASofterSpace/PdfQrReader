@@ -42,6 +42,16 @@ public class Main {
 		SimpleFile lineOutput = new SimpleFile("output.txt");
 		lineOutput.clearContent();
 
+		SimpleFile jsonOutput = new SimpleFile("output.json");
+		jsonOutput.clearContent();
+		jsonOutput.appendContent("{");
+		jsonOutput.appendContent("  \"qrcodes\": [");
+
+		SimpleFile xmlOutput = new SimpleFile("output.xml");
+		xmlOutput.clearContent();
+		xmlOutput.appendContent("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+		xmlOutput.appendContent("<qrcodes>");
+
 		for (File imageFile : imageFiles) {
 
 			Image img = ImageFile.readImageFromFile(imageFile);
@@ -104,9 +114,19 @@ public class Main {
 
 			String thisContent = code.getContent();
 
-			System.out.println("QR code is: " + thisContent + "\n");
+			if ((thisContent == null) || thisContent.equals("")) {
+				System.out.println("This image contains no QR code!\n");
+			} else {
+				System.out.println("QR code is: " + thisContent + "\n");
 
-			lineOutput.appendContent(thisContent);
+				lineOutput.appendContent(thisContent);
+
+				// TODO :: escape "
+				jsonOutput.appendContent("	\"" + thisContent + "\",");
+
+				// TODO :: escape < etc.
+				xmlOutput.appendContent("  <qrcode>" + thisContent + "</qrcode>");
+			}
 
 			/*
 			PpmFile debugFile = new PpmFile("data/qr" + imageFile.getLocalFilename() + ".ppm");
@@ -115,7 +135,19 @@ public class Main {
 			*/
 		}
 
+		String jsonContent = jsonOutput.getContent();
+		if (jsonContent.endsWith(",")) {
+			jsonOutput.setContent(jsonContent.substring(0, jsonContent.length() - 1));
+		}
+
 		lineOutput.saveWithSystemLineEndings();
+
+		jsonOutput.appendContent("  ]");
+		jsonOutput.appendContent("}");
+		jsonOutput.saveWithSystemLineEndings();
+
+		xmlOutput.appendContent("</qrcodes>");
+		xmlOutput.saveWithSystemLineEndings();
 	}
 
 }

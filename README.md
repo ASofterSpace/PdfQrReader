@@ -1,12 +1,12 @@
-# Krass
+# PDF QR Reader
 
-**Class:** A Softer Space Internal
+**Class:** Utility
 
 **Language:** Java
 
 **Platform:** Windows / Linux
 
-This is just a quick-and-dirty default project which lies around, ready to be used, modified, and discarded again... it does not have any particular purpose.
+A small program that reads a PDF file, finds QR codes inside of it and reads out their contents
 
 ## Setup
 
@@ -26,7 +26,9 @@ build.sh
 
 ## Run
 
-To start up the Krass project after it has been built, you can call under Windows:
+Before running the PDF QR Reader, you should put the PDF file that you want to use as input into the same folder and call it `input.pdf`.
+
+To now start up the PdfQrReader project after it has been built, you can call under Windows:
 
 ```
 run.bat
@@ -37,6 +39,8 @@ Or under Linux:
 ```
 run.sh
 ```
+
+After running, the output will be saved to `output.txt`.
 
 ## License
 

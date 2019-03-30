@@ -13,6 +13,7 @@ import com.asofterspace.toolbox.io.PdfFile;
 import com.asofterspace.toolbox.io.PdfObject;
 import com.asofterspace.toolbox.io.PpmFile;
 import com.asofterspace.toolbox.io.SimpleFile;
+import com.asofterspace.toolbox.io.XmlElement;
 import com.asofterspace.toolbox.utils.Image;
 import com.asofterspace.toolbox.Utils;
 
@@ -124,8 +125,7 @@ public class Main {
 				// TODO :: escape "
 				jsonOutput.appendContent("	\"" + thisContent + "\",");
 
-				// TODO :: escape < etc.
-				xmlOutput.appendContent("  <qrcode>" + thisContent + "</qrcode>");
+				xmlOutput.appendContent("  <qrcode>" + XmlElement.xmlEscape(thisContent) + "</qrcode>");
 			}
 
 			/*

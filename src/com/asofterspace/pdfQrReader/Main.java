@@ -5,6 +5,7 @@
 package com.asofterspace.pdfQrReader;
 
 import com.asofterspace.toolbox.barcodes.QrCode;
+import com.asofterspace.toolbox.barcodes.QrCodeFactory;
 import com.asofterspace.toolbox.io.BinaryFile;
 import com.asofterspace.toolbox.io.Directory;
 import com.asofterspace.toolbox.io.File;
@@ -33,6 +34,13 @@ public class Main {
 		Utils.setVersionNumber(VERSION_NUMBER);
 		Utils.setVersionDate(VERSION_DATE);
 
+		if (args.length > 0) {
+			if (args[0].equals("version_for_zip")) {
+				System.out.println("version " + Utils.getVersionNumber());
+				return;
+			}
+		}
+
 		PdfFile inputFile = new PdfFile("input.pdf");
 
 		Directory targetDir = new Directory("data");
@@ -57,76 +65,25 @@ public class Main {
 
 			Image img = ImageFile.readImageFromFile(imageFile);
 
-			// great!
-			// now try to read out a version 3 QR code...
-			// for now, let's just hardcode the QR code location:
-			// go to a column that is right-wards of the logo at the left...
-			// row four...
-			// advance to the right until you get a dark one!
-			int offsetX3 = 300;
-			for (; offsetX3 < img.getWidth(); offsetX3++) {
-				if (img.getPixel(offsetX3, 3).isDark()) {
-					break;
-				}
-			}
-			int offsetX4 = 300;
-			for (; offsetX4 < img.getWidth(); offsetX4++) {
-				if (img.getPixel(offsetX4, 4).isDark()) {
-					break;
-				}
-			}
-			int offsetX5 = 300;
-			for (; offsetX5 < img.getWidth(); offsetX5++) {
-				if (img.getPixel(offsetX5, 5).isDark()) {
-					break;
-				}
-			}
+			System.out.println("Attempting to read QR Code from " + imageFile.getLocalFilename());
 
-			int offsetY = 3;
-			int offsetX = offsetX3;
+			QrCode code = QrCodeFactory.readFromImage(img);
 
-			if (offsetX4 < offsetX) {
-				offsetY = 4;
-				offsetX = offsetX4;
-			}
-
-			if (offsetX5 < offsetX) {
-				offsetY = 5;
-				offsetX = offsetX5;
-			}
-
-			System.out.println("Reading QR Code from " + imageFile.getLocalFilename() + " at [" + img.getWidth() + " x " + offsetX + "]");
-
-			int enlargeX = 0;
-			int enlargeY = 0;
-			QrCode code = new QrCode(3);
-			for (int x = 0; x < code.getWidth(); x++) {
-				for (int y = 0; y < code.getHeight(); y++) {
-					code.setDatapoint(x, y, img.getPixel(offsetX + x + enlargeX, offsetY + y + enlargeY).isDark());
-					if (y % 4 != 3) {
-						enlargeY++;
-					}
-				}
-				if (x % 4 != 3) {
-					enlargeX++;
-				}
-				enlargeY = 0;
+			if (code == null) {
+				System.out.println("In this image, no QR code could be found.\n");
+				continue;
 			}
 
 			String thisContent = code.getContent();
 
-			if ((thisContent == null) || thisContent.equals("")) {
-				System.out.println("This image contains no QR code!\n");
-			} else {
-				System.out.println("QR code is: " + thisContent + "\n");
+			System.out.println("QR code is: " + thisContent + "\n");
 
-				lineOutput.appendContent(thisContent);
+			lineOutput.appendContent(thisContent);
 
-				// TODO :: escape "
-				jsonOutput.appendContent("	\"" + thisContent + "\",");
+			// TODO :: escape "
+			jsonOutput.appendContent("	\"" + thisContent + "\",");
 
-				xmlOutput.appendContent("  <qrcode>" + XmlElement.xmlEscape(thisContent) + "</qrcode>");
-			}
+			xmlOutput.appendContent("  <qrcode>" + XmlElement.xmlEscape(thisContent) + "</qrcode>");
 
 			/*
 			PpmFile debugFile = new PpmFile("data/qr" + imageFile.getLocalFilename() + ".ppm");

@@ -33,6 +33,10 @@ src/com/asofterspace/toolbox
 # config files
 config
 
+# release-related files
+other
+*.zip
+
 # input and output files
 *.pdf
 *.txt

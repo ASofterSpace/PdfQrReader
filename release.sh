@@ -39,12 +39,12 @@ echo "$version" > "$version"
 cd ..
 
 # zip it all up
-zip -rq pdfQrCode.zip pdfQrCode
+zip -rq pdfQrReader.zip pdfQrReader
 
-mv pdfQrCode.zip ..
+mv pdfQrReader.zip ..
 
 cd ..
 rm -rf release
 
-echo "The file pdfQrCode.zip has been created in $(pwd)"
+echo "The file pdfQrReader.zip has been created in $(pwd)"
 

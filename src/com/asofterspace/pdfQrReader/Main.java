@@ -24,8 +24,8 @@ import java.util.List;
 public class Main {
 
 	public final static String PROGRAM_TITLE = "PDF QR Reader";
-	public final static String VERSION_NUMBER = "0.0.0.1(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "29. March 2019";
+	public final static String VERSION_NUMBER = "0.0.0.2(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "29. March 2019 - 2. April 2019";
 
 	public static void main(String[] args) {
 
@@ -42,6 +42,12 @@ public class Main {
 		}
 
 		PdfFile inputFile = new PdfFile("input.pdf");
+
+		if (!inputFile.exists()) {
+			System.out.println("No input found!");
+			System.out.println("Please put a PDF into the folder of the PDF QR Reader and rename it to input.pdf.");
+			return;
+		}
 
 		Directory targetDir = new Directory("data");
 		targetDir.clear();

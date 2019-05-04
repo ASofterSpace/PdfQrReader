@@ -24,8 +24,8 @@ import java.util.List;
 public class Main {
 
 	public final static String PROGRAM_TITLE = "PDF QR Reader";
-	public final static String VERSION_NUMBER = "0.0.0.2(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "29. March 2019 - 2. April 2019";
+	public final static String VERSION_NUMBER = "0.0.0.3(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "29. March 2019 - 4. May 2019";
 
 	public static void main(String[] args) {
 
@@ -73,7 +73,7 @@ public class Main {
 
 			System.out.println("Attempting to read QR Code from " + imageFile.getLocalFilename());
 
-			QrCode code = QrCodeFactory.readFromImage(img);
+			QrCode code = QrCodeFactory.readFromSomewhereInImage(img);
 
 			if (code == null) {
 				System.out.println("In this image, no QR code could be found.\n");

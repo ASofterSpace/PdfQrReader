@@ -6,15 +6,15 @@ package com.asofterspace.pdfQrReader;
 
 import com.asofterspace.toolbox.barcodes.QrCode;
 import com.asofterspace.toolbox.barcodes.QrCodeFactory;
-import com.asofterspace.toolbox.io.BinaryFile;
 import com.asofterspace.toolbox.io.Directory;
 import com.asofterspace.toolbox.io.File;
 import com.asofterspace.toolbox.io.ImageFile;
-import com.asofterspace.toolbox.io.PdfFile;
-import com.asofterspace.toolbox.io.PdfObject;
+import com.asofterspace.toolbox.io.ImageFileCtrl;
 import com.asofterspace.toolbox.io.PpmFile;
 import com.asofterspace.toolbox.io.SimpleFile;
-import com.asofterspace.toolbox.io.XmlElement;
+import com.asofterspace.toolbox.io.XML;
+import com.asofterspace.toolbox.pdf.PdfFile;
+import com.asofterspace.toolbox.pdf.PdfImageHandler;
 import com.asofterspace.toolbox.utils.Image;
 import com.asofterspace.toolbox.Utils;
 
@@ -24,8 +24,8 @@ import java.util.List;
 public class Main {
 
 	public final static String PROGRAM_TITLE = "PDF QR Reader";
-	public final static String VERSION_NUMBER = "0.0.0.3(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "29. March 2019 - 4. May 2019";
+	public final static String VERSION_NUMBER = "0.0.0.4(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "29. March 2019 - 3. February 2020";
 
 	public static void main(String[] args) {
 
@@ -67,9 +67,12 @@ public class Main {
 		xmlOutput.appendContent("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 		xmlOutput.appendContent("<qrcodes>");
 
+		ImageFileCtrl imageFileCtrl = new ImageFileCtrl();
+		imageFileCtrl.addHandler(new PdfImageHandler());
+
 		for (File imageFile : imageFiles) {
 
-			Image img = ImageFile.readImageFromFile(imageFile);
+			Image img = imageFileCtrl.loadImageFromFile(imageFile);
 
 			System.out.println("Attempting to read QR Code from " + imageFile.getLocalFilename());
 
@@ -89,7 +92,7 @@ public class Main {
 			// TODO :: escape "
 			jsonOutput.appendContent("	\"" + thisContent + "\",");
 
-			xmlOutput.appendContent("  <qrcode>" + XmlElement.xmlEscape(thisContent) + "</qrcode>");
+			xmlOutput.appendContent("  <qrcode>" + XML.escapeXMLstr(thisContent) + "</qrcode>");
 
 			/*
 			PpmFile debugFile = new PpmFile("data/qr" + imageFile.getLocalFilename() + ".ppm");
